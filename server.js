@@ -32,11 +32,11 @@ app.get("/shoes", (req, res) => {
         const minprice = parseInt(q.minprice)
         const maxprice = parseInt(q.maxprice)
 
-        if(q.minprice && minprice >= shoe.price){
+        if(q.minprice && minprice > shoe.price){
             
             result = false;//if it does pass this condition then it means that the shoe is cheaper than what the user wants so skip it
         }
-        if (q.maxprice && maxprice <= shoe.price){
+        if (q.maxprice && maxprice < shoe.price){
             
             result = false;
         }
@@ -45,14 +45,19 @@ app.get("/shoes", (req, res) => {
             result = false;
         }
         return result;
-        // return (
-        //     (!q.minprice || shoe.price >= minprice) &&
-        //     (!q.maxprice || shoe.price <= maxprice) &&
-        //     (!q.type || shoe.type === q.type)
-        // );
     });
 
-    res.send(matchingShoes)
+    //check if the array has results in it
+    if(matchingShoes.length > 0){
+        let output = matchingShoes.map(shoe => // takes one shoe object from the array mathcingshoes with the results, then through map 
+            //it runs the callback, which is turning it into a string
+            `Name: ${shoe.name}, Price: $${shoe.price}, Type: ${shoe.type}`
+        ).join('<br/> <br/>');//then using join, it outputs each string in the new array created by map into a split string with break. cause with another seperator res.send would print combined strings
+        res.send(`${output}`)
+    }else{//to display a msg if no shoe based on params based was found
+        res.send("Sorry, no shoes!")
+    }
+    
 });
 app.get("/greetings/:username", (req, res) => {
     res.send(`Hello there, ${req.params.username}`)
